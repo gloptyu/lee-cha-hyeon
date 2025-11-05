@@ -1,3 +1,4 @@
 import streamlit as st
-st.title('이차현 해체분석 하기!')
-st.write('안녕하세요, 만나서 반가워요!')
+st.title('나의 첫 웹서비스 만들기!')
+st.text_input('이름을 입력해주세요')
+st.button('인사말 생성')
