@@ -3,30 +3,90 @@ import folium
 from streamlit_folium import st_folium
 import pandas as pd
 
-st.set_page_config(page_title="Seoul Top10 (Folium)", layout="wide")
+st.set_page_config(page_title="서울 주요 관광지 TOP10", layout="wide")
 
-# --- 데이터 ---
+# --- 서울 주요 관광지 데이터 ---
 ATTRACTIONS = [
-    {"name": "Gyeongbokgung Palace", "lat": 37.579617, "lon": 126.977041, "desc": "Grand palace of the Joseon dynasty; must-see historical site."},
-    {"name": "Changdeokgung Palace & Secret Garden", "lat": 37.579377, "lon": 126.991047, "desc": "UNESCO site; beautiful gardens and palace architecture."},
-    {"name": "Bukchon Hanok Village", "lat": 37.582600, "lon": 126.983000, "desc": "Traditional hanok neighborhood between palaces."},
-    {"name": "N Seoul Tower (Namsan)", "lat": 37.551169, "lon": 126.988226, "desc": "Iconic tower with city views and romantic night lights."},
-    {"name": "Myeongdong Shopping Street", "lat": 37.560975, "lon": 126.986016, "desc": "Famous shopping street with street food and cosmetics."},
-    {"name": "Insadong", "lat": 37.574435, "lon": 126.984969, "desc": "Traditional street with tea houses and craft shops."},
-    {"name": "Dongdaemun Design Plaza (DDP)", "lat": 37.566295, "lon": 127.009005, "desc": "Futuristic architecture and night markets."},
-    {"name": "Hongdae", "lat": 37.556256, "lon": 126.922655, "desc": "Youth culture, music, cafes, and nightlife."},
-    {"name": "Gangnam (COEX Mall)", "lat": 37.512021, "lon": 127.058567, "desc": "Upscale shopping and K-pop culture hub."},
-    {"name": "Lotte World Tower", "lat": 37.512569, "lon": 127.102492, "desc": "Skyscraper with observation deck and mall."},
+    {
+        "name": "경복궁",
+        "lat": 37.579617,
+        "lon": 126.977041,
+        "desc": "조선의 법궁으로, 가장 대표적인 궁궐입니다. 근정전, 경회루 등 한국 전통 건축미를 감상할 수 있습니다.",
+        "trans": "지하철 3호선 경복궁역 5번 출구 도보 5분"
+    },
+    {
+        "name": "창덕궁과 후원",
+        "lat": 37.579377,
+        "lon": 126.991047,
+        "desc": "유네스코 세계문화유산으로 지정된 조선시대 궁궐입니다. 자연과 조화를 이룬 아름다운 후원이 유명합니다.",
+        "trans": "지하철 3호선 안국역 3번 출구 도보 5분"
+    },
+    {
+        "name": "북촌한옥마을",
+        "lat": 37.582600,
+        "lon": 126.983000,
+        "desc": "전통 한옥이 밀집된 마을로, 한복 체험과 전통 공예 체험이 가능합니다.",
+        "trans": "지하철 3호선 안국역 2번 출구 도보 10분"
+    },
+    {
+        "name": "남산서울타워",
+        "lat": 37.551169,
+        "lon": 126.988226,
+        "desc": "서울 전경을 한눈에 볼 수 있는 전망 명소입니다. 야경이 아름답고, 사랑의 자물쇠로 유명합니다.",
+        "trans": "명동역(4호선) 3번 출구 → 남산순환버스 05번 이용"
+    },
+    {
+        "name": "명동거리",
+        "lat": 37.560975,
+        "lon": 126.986016,
+        "desc": "외국인 관광객이 가장 많이 찾는 쇼핑거리로, 화장품 매장과 길거리 음식이 가득합니다.",
+        "trans": "지하철 4호선 명동역 6번 출구"
+    },
+    {
+        "name": "인사동 문화거리",
+        "lat": 37.574435,
+        "lon": 126.984969,
+        "desc": "전통 공예품, 찻집, 갤러리 등이 모여 있는 문화의 거리입니다. 한국적인 분위기를 느낄 수 있습니다.",
+        "trans": "지하철 3호선 안국역 6번 출구 도보 5분"
+    },
+    {
+        "name": "동대문디자인플라자(DDP)",
+        "lat": 37.566295,
+        "lon": 127.009005,
+        "desc": "서울의 랜드마크 중 하나로, 현대적인 디자인과 패션 전시가 어우러진 복합문화공간입니다.",
+        "trans": "지하철 2·4·5호선 동대문역사문화공원역 1번 출구"
+    },
+    {
+        "name": "홍대거리",
+        "lat": 37.556256,
+        "lon": 126.922655,
+        "desc": "젊음의 거리로 불리며, 음악 공연, 거리 예술, 맛집, 카페가 밀집해 있습니다.",
+        "trans": "지하철 2호선 홍대입구역 9번 출구"
+    },
+    {
+        "name": "강남 코엑스몰",
+        "lat": 37.512021,
+        "lon": 127.058567,
+        "desc": "쇼핑, 전시, 영화관, 아쿠아리움 등이 있는 대형 복합문화공간입니다.",
+        "trans": "지하철 2호선 삼성역 5·6번 출구"
+    },
+    {
+        "name": "롯데월드타워",
+        "lat": 37.512569,
+        "lon": 127.102492,
+        "desc": "123층 초고층 건물로, 전망대 서울스카이와 쇼핑몰, 아쿠아리움 등을 즐길 수 있습니다.",
+        "trans": "지하철 2·8호선 잠실역 1번 출구"
+    },
 ]
 
 df = pd.DataFrame(ATTRACTIONS)
 
-# --- 레이아웃 ---
+# --- 화면 구성 ---
 col1, col2 = st.columns((1, 2))
 
 with col1:
-    st.title("🏙️ Seoul — Top 10 Attractions")
-    st.markdown("서울의 대표 관광지 10곳을 Folium 지도로 표시합니다.")
+    st.title("🇰🇷 서울 주요 관광지 TOP10")
+    st.markdown("서울을 처음 방문하는 외국인에게 인기 있는 대표 명소 10곳을 소개합니다.")
     st.sidebar.header("설정")
     show_map = st.sidebar.checkbox("지도 표시", value=True)
     selected = st.sidebar.selectbox("하이라이트할 장소", ["전체 보기"] + df["name"].tolist())
@@ -36,7 +96,7 @@ with col2:
         m = folium.Map(location=[37.5665, 126.9780], zoom_start=12)
 
         for i, row in df.iterrows():
-            popup = f"<b>{row['name']}</b><br>{row['desc']}"
+            popup = f"<b>{row['name']}</b><br>{row['desc']}<br><i>{row['trans']}</i>"
             color = "red" if selected == row["name"] else "blue"
             folium.Marker(
                 [row["lat"], row["lon"]],
@@ -51,12 +111,12 @@ with col2:
 
         st_folium(m, width=630, height=420)
 
-        # 지도 아래 관광지 설명
-        st.markdown("### 🗺️ 관광지 간단 설명")
+        # 지도 하단 관광지 간단 정보
+        st.markdown("### 🗺️ 관광지 요약 정보")
         for i, row in df.iterrows():
-            st.markdown(f"**{i+1}. {row['name']}** — {row['desc']}")
+            st.markdown(f"**{i+1}. {row['name']}** — {row['desc']}  \n🚇 {row['trans']}")
     else:
         st.info("사이드바에서 '지도 표시'를 체크하면 지도를 볼 수 있습니다.")
 
 st.markdown("---")
-st.caption("데이터 출처: VisitSeoul, Tripadvisor, Lonely Planet 등 공개 여행 자료 기반.")
+st.caption("데이터 출처: 서울관광재단, VisitSeoul, 서울교통공사 등 공개 자료를 기반으로 정리하였습니다.")
