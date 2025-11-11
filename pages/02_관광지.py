@@ -184,23 +184,3 @@ with col2:
 # --- Footer / notes ---
 st.markdown("---")
 st.caption("데이터 출처: VisitSeoul, Tripadvisor, Lonely Planet 등 공개 여행 자료를 기반으로 편집(예시 좌표 포함).\n앱 코드와 requirements.txt를 그대로 복사하여 Streamlit Cloud에 배포하세요.")
-
-
-# =====================
-# requirements.txt (copy this into a separate file named requirements.txt)
-# =====================
-#
-# streamlit
-# folium
-# streamlit-folium
-# pandas
-#
-# Optional (if you want to pin versions):
-# streamlit==1.26.0
-# folium==0.14.0
-# streamlit-folium==0.12.2
-# pandas==2.2.0
-#
-# ---------------------
-# End of file
-# ---------------------
