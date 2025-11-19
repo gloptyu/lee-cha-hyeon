@@ -2,76 +2,76 @@ import streamlit as st
 
 st.set_page_config(page_title="축구선수 TOP10", layout="centered")
 
-# 선수 데이터 (최신 이미지 URL 포함)
+# 로컬 이미지 기준 선수 데이터
 PLAYERS = {
     "리오넬 메시": {
         "club": "인터 마이애미",
         "nationality": "아르헨티나",
         "team_color": "#FF5DA2",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/8/80/Lionel_Messi_20180626.jpg",
+        "image": "images/messi.jpg",
         "career": "바르셀로나에서 전설적인 커리어를 쌓고 PSG, 인터 마이애미로 이어진 세계 최고의 플레이메이커 및 드리블러. 발롱도르 다수 수상.",
     },
     "크리스티아누 호날두": {
         "club": "알나스르",
         "nationality": "포르투갈",
         "team_color": "#FFD700",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Cristiano_Ronaldo_2018.jpg",
+        "image": "images/ronaldo.jpg",
         "career": "맨유-레알-유벤투스를 거쳐 알나스르에서 활약 중. 역사상 가장 많은 공식 경기 골 중 하나를 기록한 괴물 공격수.",
     },
     "킬리안 음바페": {
         "club": "레알 마드리드",
         "nationality": "프랑스",
         "team_color": "#FFFFFF",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/8/85/Kylian_Mbapp%C3%A9_2022.jpg",
+        "image": "images/mbappe.jpg",
         "career": "PSG와 프랑스 대표팀의 핵심이자 현재 레알 마드리드 에이스. 폭발적인 스피드와 득점력으로 월드클래스 입증.",
     },
     "네이마르": {
         "club": "산투스",
         "nationality": "브라질",
         "team_color": "#FFFFFF",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Neymar_2018.jpg",
+        "image": "images/neymar.jpg",
         "career": "기술과 창의성의 아이콘. 산투스–바르셀로나–PSG를 거쳐 다시 산투스로 복귀한 브라질 대표 슈퍼스타.",
     },
     "케빈 더 브라위너": {
         "club": "나폴리",
         "nationality": "벨기에",
         "team_color": "#00AEEF",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Kevin_De_Bruyne_20180709.jpg",
+        "image": "images/debruyne.jpg",
         "career": "세계 최고 패서 중 하나. 맨시티의 황금기 주역 후 나폴리로 이적. 패스 · 시야 · 조율 능력 최상급.",
     },
     "모하메드 살라": {
         "club": "리버풀",
         "nationality": "이집트",
         "team_color": "#C8102E",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Mohamed_Salah_2018.jpg",
+        "image": "images/salah.jpg",
         "career": "프리미어리그 최정상급 득점자. 빠른 스피드와 왼발 마무리가 강점. 리버풀의 살아있는 전설.",
     },
     "로베르트 레반도프스키": {
         "club": "FC 바르셀로나",
         "nationality": "폴란드",
         "team_color": "#A50044",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/7/72/Robert_Lewandowski_2019.jpg",
+        "image": "images/lewandowski.jpg",
         "career": "역사급 골게터. 도르트문트–바이에른–바르셀로나로 이어진 커리어. 포지셔닝과 결정력의 교과서.",
     },
     "버질 반 다이크": {
         "club": "리버풀",
         "nationality": "네덜란드",
         "team_color": "#C8102E",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Virgil_van_Dijk_2018.jpg",
+        "image": "images/vandijk.jpg",
         "career": "현대 축구 최고의 센터백 중 한 명. 피지컬, 리더십, 수비 안정성을 모두 갖춘 리버풀의 핵심.",
     },
     "루카 모드리치": {
         "club": "레알 마드리드",
         "nationality": "크로아티아",
         "team_color": "#FFFFFF",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/9/92/Luka_Modric_2018.jpg",
+        "image": "images/modric.jpg",
         "career": "중원 지배자. 레알 마드리드 미드필더로 오랜 기간 정상급 활약. 발롱도르 수상 경험.",
     },
     "얼링 홀란": {
         "club": "맨체스터 시티",
         "nationality": "노르웨이",
         "team_color": "#6CABDD",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/5/56/Erling_Haaland_2021.jpg",
+        "image": "images/haaland.jpg",
         "career": "괴물적인 피지컬과 득점력. 도르트문트에서 성장 후 맨시티에서 EPL 기록을 갈아치우는 중.",
     },
 }
