@@ -1,155 +1,116 @@
 import streamlit as st
 
-st.set_page_config(page_title="Top10 Footballers — Stylish Picks", layout="centered")
+st.set_page_config(page_title="축구선수 TOP10", layout="centered")
 
+# 선수 데이터 (사진 포함)
 PLAYERS = {
-    "Lionel Messi": {
-        "club": "Inter Miami",
-        "nationality": "Argentina",
-        "team_color": "#FF5DA2",  # Inter Miami pink
-        "career": (
-            "World-class forward — multiple Ballon d'Ors, long spells at Barcelona (legend), Paris Saint-Germain, and Inter Miami. "
-            "Known for dribbling, vision, and free-kicks."
-        ),
+    "리오넬 메시": {
+        "club": "인터 마이애미",
+        "nationality": "아르헨티나",
+        "team_color": "#FF5DA2",
+        "image": "https://i.imgur.com/2yaf2pB.jpeg",
+        "career": "바르셀로나에서 전설적인 커리어를 쌓고 PSG, 인터 마이애미로 이어진 세계 최고의 플레이메이커 및 드리블러. 발롱도르 다수 수상.",
     },
-    "Cristiano Ronaldo": {
-        "club": "Al Nassr",
-        "nationality": "Portugal",
-        "team_color": "#FFD700",  # Al Nassr yellow (primary)
-        "career": (
-            "Elite goal-scorer across Sporting CP, Manchester United, Real Madrid, Juventus, and Al Nassr. "
-            "Explosive, great in the air, and a clutch finisher."
-        ),
+    "크리스티아누 호날두": {
+        "club": "알나스르",
+        "nationality": "포르투갈",
+        "team_color": "#FFD700",
+        "image": "https://i.imgur.com/E0y6o7H.jpeg",
+        "career": "맨유-레알-유벤투스를 거쳐 알나스르에서 활약 중. 역사상 가장 많은 공식 경기 골 중 하나를 기록한 괴물 공격수.",
     },
-    "Kylian Mbappé": {
-        "club": "Real Madrid",
-        "nationality": "France",
-        "team_color": "#FFFFFF",  # Real Madrid white
-        "career": (
-            "Pacy forward who starred for Monaco and PSG before moving to Real Madrid. "
-            "Exceptional speed, finishing, and big-game impact."
-        ),
+    "킬리안 음바페": {
+        "club": "레알 마드리드",
+        "nationality": "프랑스",
+        "team_color": "#FFFFFF",
+        "image": "https://i.imgur.com/C5q5xlv.jpeg",
+        "career": "PSG와 프랑스 대표팀의 핵심이자 현재 레알 마드리드 에이스. 폭발적인 스피드와 득점력으로 월드클래스 입증.",
     },
-    "Neymar Jr.": {
-        "club": "Santos",
-        "nationality": "Brazil",
-        "team_color": "#FFFFFF",  # Santos white
-        "career": (
-            "Flair-filled Brazilian forward — rose to fame at Santos, starred at Barcelona and PSG, and returned to Santos. "
-            "Creative dribbler and playmaker."
-        ),
+    "네이마르": {
+        "club": "산투스",
+        "nationality": "브라질",
+        "team_color": "#FFFFFF",
+        "image": "https://i.imgur.com/lcYYu7g.jpeg",
+        "career": "기술과 창의성의 아이콘. 산투스–바르셀로나–PSG를 거쳐 다시 산투스로 복귀한 브라질 대표 슈퍼스타.",
     },
-    "Kevin De Bruyne": {
-        "club": "Napoli",
-        "nationality": "Belgium",
-        "team_color": "#00AEEF",  # Napoli sky blue
-        "career": (
-            "World-class midfielder, known for vision and passing; long success at Manchester City before joining Napoli. "
-            "Master of through-balls and set-piece deliveries."
-        ),
+    "케빈 더 브라위너": {
+        "club": "나폴리",
+        "nationality": "벨기에",
+        "team_color": "#00AEEF",
+        "image": "https://i.imgur.com/0j2Q0fF.jpeg",
+        "career": "세계 최고 패서 중 하나. 맨시티의 황금기 주역 후 나폴리로 이적. 패스 · 시야 · 조율 능력 최상급.",
     },
-    "Mohamed Salah": {
-        "club": "Liverpool",
-        "nationality": "Egypt",
-        "team_color": "#C8102E",  # Liverpool red
-        "career": (
-            "Prolific winger/forward at Liverpool with excellent goal return. "
-            "Rapid, clinical and a constant threat on the right flank."
-        ),
+    "모하메드 살라": {
+        "club": "리버풀",
+        "nationality": "이집트",
+        "team_color": "#C8102E",
+        "image": "https://i.imgur.com/VRqO37U.jpeg",
+        "career": "프리미어리그 최정상급 득점자. 빠른 스피드와 왼발 마무리가 강점. 리버풀의 살아있는 전설.",
     },
-    "Robert Lewandowski": {
-        "club": "FC Barcelona",
-        "nationality": "Poland",
-        "team_color": "#A50044",  # Barcelona garnet (primary)
-        "career": (
-            "Clinical centre-forward — Bayern Munich icon, later Barcelona. "
-            "Reliable finishing, movement and physical presence in the box."
-        ),
+    "로베르트 레반도프스키": {
+        "club": "FC 바르셀로나",
+        "nationality": "폴란드",
+        "team_color": "#A50044",
+        "image": "https://i.imgur.com/1T2zQyf.jpeg",
+        "career": "역사급 골게터. 도르트문트–바이에른–바르셀로나로 이어진 커리어. 포지셔닝과 결정력의 교과서.",
     },
-    "Virgil van Dijk": {
-        "club": "Liverpool",
-        "nationality": "Netherlands",
-        "team_color": "#C8102E",  # Liverpool red
-        "career": (
-            "Dominant centre-back; leadership and aerial strength. Key figure in Liverpool's recent successes."
-        ),
+    "버질 반 다이크": {
+        "club": "리버풀",
+        "nationality": "네덜란드",
+        "team_color": "#C8102E",
+        "image": "https://i.imgur.com/eSh3YLi.jpeg",
+        "career": "현대 축구 최고의 센터백 중 한 명. 피지컬, 리더십, 수비 안정성을 모두 갖춘 리버풀의 핵심.",
     },
-    "Luka Modrić": {
-        "club": "Real Madrid",
-        "nationality": "Croatia",
-        "team_color": "#FFFFFF",  # Real Madrid white
-        "career": (
-            "Elegant midfield maestro known for control, passing and game management. Long-serving Real Madrid playmaker."
-        ),
+    "루카 모드리치": {
+        "club": "레알 마드리드",
+        "nationality": "크로아티아",
+        "team_color": "#FFFFFF",
+        "image": "https://i.imgur.com/9V4mC6t.jpeg",
+        "career": "중원 지배자. 레알 마드리드 미드필더로 오랜 기간 정상급 활약. 발롱도르 수상 경험.",
     },
-    "Erling Haaland": {
-        "club": "Manchester City",
-        "nationality": "Norway",
-        "team_color": "#6CABDD",  # Man City sky blue
-        "career": (
-            "Phenomenal goalscoring striker — rapid rise at Salzburg and Dortmund, then Manchester City. "
-            "Powerful, clinical and lethal in the box."
-        ),
+    "얼링 홀란": {
+        "club": "맨체스터 시티",
+        "nationality": "노르웨이",
+        "team_color": "#6CABDD",
+        "image": "https://i.imgur.com/bz0z6pA.jpeg",
+        "career": "괴물적인 피지컬과 득점력. 도르트문트에서 성장 후 맨시티에서 EPL 기록을 갈아치우는 중.",
     },
 }
 
-st.title("⚽ Top 10 Footballers — 내 입맛대로 뽑은 순위")
-st.caption("선수 선택하면 해당 선수의 커리어·국적·팀컬러(배경) 보여줍니다.")
+st.title("⚽ 내 입맛대로 뽑은 축구선수 TOP10")
+st.caption("선수를 선택하면 사진, 커리어, 국적, 팀컬러 기반 배경이 나타납니다.")
 
-player_choice = st.selectbox("선수 고르기", list(PLAYERS.keys()))
+player_choice = st.selectbox("선수 선택", list(PLAYERS.keys()))
 player = PLAYERS[player_choice]
 
-# Apply background color to the whole page using CSS
-bg_color = player["team_color"]
-page_css = f'''
+# 배경색 CSS 적용
+bg = player["team_color"]
+st.markdown(f"""
 <style>
-    .stApp {{
-        background: linear-gradient(180deg, {bg_color}10 0%, {bg_color}20 100%);
-        color: #111;
-    }}
-    .player-card {{
-        background: rgba(255,255,255,0.85);
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-    }}
-    .badge {{
-        display:inline-block;
-        padding:6px 10px;
-        border-radius:999px;
-        font-weight:600;
-        margin-top:6px;
-    }}
+.stApp {{
+    background: linear-gradient(180deg, {bg}22 0%, {bg}55 100%);
+}}
+.player-box {{
+    background: rgba(255,255,255,0.8);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}}
 </style>
-'''
-st.markdown(page_css, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-# Player card
-with st.container():
-    st.markdown(f"<div class='player-card'>", unsafe_allow_html=True)
-    st.markdown(f"### {player_choice}")
-    st.markdown(f"**클럽(팀컬러):** {player['club']} — <span class='badge' style='background:{player['team_color']};color:#fff'>{player['team_color']}</span>")
-    st.markdown(f"**국적:** {player['nationality']}")
-    st.markdown(f"**커리어 요약:** {player['career']}")
-
-    # Small playful line about "간지"
-    st.markdown("---")
-    st.markdown("**간지 포인트:** 이 선수 셔츠에 네가 이 앱을 쓰면 간지 폭발! ✨\n\n" 
-                "(참고: 여기 '너'는 사용자, '나'는 이 앱의 추천 가이드일 뿐이에요 😎)")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# Footer with ordering
+# 선수 카드
+st.markdown("<div class='player-box'>", unsafe_allow_html=True)
+st.image(player["image"], width=350)
+st.subheader(player_choice)
+st.write(f"**클럽:** {player['club']}")
+st.write(f"**국적:** {player['nationality']}")
+st.write(f"**커리어 요약:** {player['career']}")
 st.markdown("---")
-st.write("**전체 Top10 (내 입맛대로)**")
-for i, name in enumerate(PLAYERS.keys(), start=1):
-    st.write(f"{i}. {name} — {PLAYERS[name]['club']} ({PLAYERS[name]['nationality']})")
+st.write("✨ **간지 포인트:** 사진까지 박혀서 바로 팬페이지 뺨치는 간지! 이 앱 켜는 순간 너도 감독급.")
+st.markdown("</div>", unsafe_allow_html=True)
 
-st.sidebar.title("About")
-st.sidebar.info("이 작은 앱은 예시용입니다. 팀컬러는 대표 색상(주로 홈 유니폼 컬러)을 사용했습니다.")
-
-# Small export button to copy player info
-if st.button("이 선수 정보 복사하기 (클립보드)"):
-    info_text = f"{player_choice} | {player['club']} | {player['nationality']} | {player['career']}"
-    st.write("복사된 텍스트:\n", info_text)
-    # 실제 클립보드 복사는 브라우저 사이드 스크립트가 필요해서 여기서는 표시만 합니다.
+# 전체 순위 출력
+st.markdown("---")
+st.write("### 전체 TOP10")
+for i, n in enumerate(PLAYERS.keys(), start=1):
+    st.write(f"{i}. {n} — {PLAYERS[n]['club']} ({PLAYERS[n]['nationality']})")
