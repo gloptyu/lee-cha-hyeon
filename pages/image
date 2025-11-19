@@ -1,0 +1,6 @@
+project_folder/
+│─ streamlit_app.py
+│─ images/
+   │─ messi.jpg
+   │─ ronaldo.jpg
+   │─ ... 기타 선수 사진
