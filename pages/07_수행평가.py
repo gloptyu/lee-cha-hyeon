@@ -1,29 +1,54 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import random
 
-st.set_page_config(page_title="스포츠 선수 비교 시스템", layout="wide")
+st.set_page_config(page_title="축구 선수 TOP10 비교", layout="wide")
 
-st.title("🏆 스포츠 선수 비교 & 분석 시스템")
+st.title("⚽ 축구 선수 TOP10 비교 & 추천 시스템")
 
 # -----------------------
-# 1. 선수 DB
+# 1. 축구 선수 DB
 # -----------------------
 data = {
-    "이름": ["손흥민", "메시", "호날두", "김연아", "르브론 제임스", "스테판 커리", "음바페", "네이마르", "해리 케인", "이강인"],
-    "종목": ["축구", "축구", "축구", "피겨스케이팅", "농구", "농구", "축구", "축구", "축구", "축구"],
-    "스피드": [95, 88, 89, 92, 85, 90, 96, 93, 88, 87],
-    "기술": [93, 99, 94, 98, 90, 99, 95, 97, 89, 92],
-    "파워": [86, 80, 95, 78, 98, 85, 90, 83, 88, 75],
-    "지능": [92, 99, 92, 97, 98, 95, 91, 90, 93, 96],
+    "이름": ["손흥민", "리오넬 메시", "크리스티아누 호날두", "킬리안 음바페", "네이마르",
+             "케빈 더 브라위너", "모하메드 살라", "로베르트 레반도프스키", "버질 반 다이크", "이강인"],
+    "클럽": ["토트넘", "인터 마이애미", "알나스르", "레알 마드리드", "산투스",
+             "나폴리", "리버풀", "FC 바르셀로나", "리버풀", "마요르카"],
+    "국적": ["대한민국", "아르헨티나", "포르투갈", "프랑스", "브라질",
+             "벨기에", "이집트", "폴란드", "네덜란드", "대한민국"],
+    "스피드": [95, 88, 87, 96, 91, 79, 92, 76, 70, 87],
+    "드리블": [93, 95, 89, 90, 94, 85, 91, 82, 60, 88],
+    "슈팅": [85, 92, 93, 91, 86, 88, 90, 95, 65, 80],
+    "패스": [82, 91, 82, 80, 87, 94, 80, 78, 82, 90],
+    "수비": [40, 30, 35, 40, 30, 50, 35, 40, 94, 45],
+    "골": [22, 30, 28, 26, 22, 12, 27, 34, 5, 10],
+    "도움": [12, 20, 15, 18, 19, 21, 13, 9, 3, 8],
+    "경기": [34, 35, 32, 33, 30, 34, 33, 36, 32, 30],
+    "이미지": [
+        "https://upload.wikimedia.org/wikipedia/commons/2/2e/Son_Heung-min_2022.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lionel_Messi_20180710.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/8/8c/Cristiano_Ronaldo_2018.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/5/5c/Kylian_Mbapp%C3%A9_2022.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/3/37/Neymar_2018.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/0/0a/Kevin_De_Bruyne_2018.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/0/0c/Mohamed_Salah_2018.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/7/7b/Robert_Lewandowski_2021.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/1/12/Virgil_van_Dijk_2019.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/0/0f/Lee_Gang-in_2021.jpg"
+    ]
 }
+
 df = pd.DataFrame(data)
 
 # -----------------------
-# 2. 선수 선택
+# 2. 선수 선택 (축구 선수 전용)
 # -----------------------
-st.sidebar.header("⚙️ 비교 설정")
-selected_players = st.sidebar.multiselect("비교할 선수 선택 (2~4명)", df["이름"], default=["손흥민", "메시"])
+selected_players = st.sidebar.multiselect(
+    "비교할 선수 선택 (축구 선수만)",
+    df["이름"],
+    default=[df["이름"][0], df["이름"][1]]  # 기본 2명 선택
+)
 
 if len(selected_players) < 2:
     st.warning("선수를 최소 2명 이상 선택하세요!")
@@ -34,9 +59,9 @@ compare_df = df[df["이름"].isin(selected_players)]
 # -----------------------
 # 3. 레이더 차트
 # -----------------------
-st.subheader("📌 선수 능력치 레이더 차트")
+st.subheader("📌 능력치 레이더 차트")
 
-categories = ["스피드", "기술", "파워", "지능"]
+categories = ["스피드", "드리블", "슈팅", "패스", "수비"]
 fig = go.Figure()
 
 for _, row in compare_df.iterrows():
@@ -47,76 +72,43 @@ for _, row in compare_df.iterrows():
         name=row["이름"]
     ))
 
-fig.update_layout(height=500, showlegend=True)
+fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=True)
 st.plotly_chart(fig, use_container_width=True)
 
 # -----------------------
-# 4. 세부 능력치 표
+# 4. 시즌 기록 막대 차트
 # -----------------------
-st.subheader("📊 선수 능력치 비교 표")
-st.dataframe(compare_df.set_index("이름"))
+st.subheader("📊 시즌 기록 비교")
 
-# -----------------------
-# 5. 바 차트 (기술 능력 비교)
-# -----------------------
-st.subheader("🔥 기술 능력 비교 그래프")
-
-fig2 = go.Figure(data=[
-    go.Bar(
-        x=compare_df["이름"],
-        y=compare_df["기술"]
-    )
-])
-
-fig2.update_layout(yaxis_title="기술 능력치")
-st.plotly_chart(fig2, use_container_width=True)
+season_data = compare_df.set_index("이름")[["골", "도움", "경기"]].T
+st.bar_chart(season_data)
 
 # -----------------------
-# 6. 간단한 경기력 예측 모델
+# 5. 선수 카드
 # -----------------------
-st.subheader("🔮 경기력 예측 (샘플)")
-
-compare_df["예측 점수"] = (
-    compare_df["스피드"] * 0.25 +
-    compare_df["기술"] * 0.35 +
-    compare_df["파워"] * 0.2 +
-    compare_df["지능"] * 0.2
-)
-
-winner = compare_df.sort_values("예측 점수", ascending=False).iloc[0]
-
-st.success(f"🏅 *예측 결과*: **{winner['이름']}** 선수가 가장 높은 경기력을 기록할 것으로 예상됩니다!")
+st.subheader("🃏 선수 카드")
+cols = st.columns(len(compare_df))
+for i, (_, row) in enumerate(compare_df.iterrows()):
+    with cols[i]:
+        st.image(row["이미지"], width=200)
+        st.subheader(row["이름"])
+        st.write(f"클럽: {row['클럽']}")
+        st.write(f"국적: {row['국적']}")
 
 # -----------------------
-# 7. 선수 추천 기능
+# 6. AI 비교 분석
 # -----------------------
-st.subheader("🤖 AI 기반 선수 추천")
-
-option = st.selectbox("원하는 스타일을 선택하세요", ["스피드형", "기술형", "파워형", "밸런스형"])
-
-if option == "스피드형":
-    best = df.sort_values("스피드", ascending=False).iloc[0]
-elif option == "기술형":
-    best = df.sort_values("기술", ascending=False).iloc[0]
-elif option == "파워형":
-    best = df.sort_values("파워", ascending=False).iloc[0]
-else:
-    df["합계"] = df[["스피드", "기술", "파워", "지능"]].sum(axis=1)
-    best = df.sort_values("합계", ascending=False).iloc[0]
-
-st.info(f"👉 추천 선수: **{best['이름']}** (종목: {best['종목']})")
+st.subheader("🤖 AI 비교 분석")
+compare_df["총합"] = compare_df[categories].sum(axis=1)
+winner = compare_df.sort_values("총합", ascending=False).iloc[0]
+st.success(f"🏅 예상 최강 선수: **{winner['이름']}** (총합 능력치: {winner['총합']})")
 
 # -----------------------
-# 8. 종목 설명
+# 7. 오늘의 추천 선수
 # -----------------------
-st.subheader("📘 종목 설명")
-
-sports_info = {
-    "축구": "축구는 스피드, 기술, 지능의 균형이 매우 중요한 팀 스포츠입니다.",
-    "피겨스케이팅": "피겨는 예술성과 점프·스핀 기술의 정확성이 모두 요구됩니다.",
-    "농구": "농구는 파워, 점프력, 경기 지능이 크게 작용하는 종목입니다."
-}
-
-for sport in compare_df["종목"].unique():
-    st.write(f"### 🏟 {sport}")
-    st.write(sports_info[sport])
+st.subheader("🎯 오늘의 추천 선수")
+random_player = compare_df.sample(1).iloc[0]
+st.info(f"추천 선수: **{random_player['이름']}**")
+st.image(random_player["이미지"], width=200)
+st.write(f"클럽: {random_player['클럽']}")
+st.write(f"국적: {random_player['국적']}")
