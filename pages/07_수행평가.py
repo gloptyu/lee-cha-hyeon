@@ -1,180 +1,122 @@
 import streamlit as st
+import pandas as pd
 import plotly.graph_objects as go
-import random
-from functools import lru_cache
 
-st.set_page_config(page_title="축구선수 TOP10", layout="wide")
+st.set_page_config(page_title="스포츠 선수 비교 시스템", layout="wide")
 
-# ------------------------------
-# 다크모드 / 라이트모드 전환
-# ------------------------------
-mode = st.toggle("🌙 다크모드")
-if mode:
-    bg_color = "#111111"
-    font_color = "white"
-else:
-    bg_color = "white"
-    font_color = "black"
+st.title("🏆 스포츠 선수 비교 & 분석 시스템")
 
-page_bg = f"""
-<style>
-body {{
-    background: {bg_color};
-    color: {font_color};
-}}
-.player-card {{
-    padding: 15px;
-    border-radius: 15px;
-    transition: 0.3s;
-    box-shadow: 0px 0px 5px #00000020;
-}}
-.player-card:hover {{
-    transform: scale(1.03);
-    box-shadow: 0px 0px 20px #00000050;
-}}
-</style>
-"""
-st.markdown(page_bg, unsafe_allow_html=True)
+# -----------------------
+# 1. 선수 DB
+# -----------------------
+data = {
+    "이름": ["손흥민", "메시", "호날두", "김연아", "르브론 제임스", "스테판 커리", "음바페", "네이마르", "해리 케인", "이강인"],
+    "종목": ["축구", "축구", "축구", "피겨스케이팅", "농구", "농구", "축구", "축구", "축구", "축구"],
+    "스피드": [95, 88, 89, 92, 85, 90, 96, 93, 88, 87],
+    "기술": [93, 99, 94, 98, 90, 99, 95, 97, 89, 92],
+    "파워": [86, 80, 95, 78, 98, 85, 90, 83, 88, 75],
+    "지능": [92, 99, 92, 97, 98, 95, 91, 90, 93, 96],
+}
+df = pd.DataFrame(data)
 
-# ----------------------------------------------------
-# 데이터
-# ----------------------------------------------------
-PLAYERS = { ... (너가 준 데이터 그대로) ... }
+# -----------------------
+# 2. 선수 선택
+# -----------------------
+st.sidebar.header("⚙️ 비교 설정")
+selected_players = st.sidebar.multiselect("비교할 선수 선택 (2~4명)", df["이름"], default=["손흥민", "메시"])
 
-# ----------------------------------------------------
-# 사진 캐시(에러 방지)
-# ----------------------------------------------------
-@lru_cache
-def load_image(url):
-    return url
+if len(selected_players) < 2:
+    st.warning("선수를 최소 2명 이상 선택하세요!")
+    st.stop()
 
-# ----------------------------------------------------
-# 선수 검색 기능
-# ----------------------------------------------------
-search = st.text_input("🔎 선수 검색", "")
+compare_df = df[df["이름"].isin(selected_players)]
 
-if search != "":
-    filtered = {k:v for k,v in PLAYERS.items() if search in k}
-else:
-    filtered = PLAYERS
+# -----------------------
+# 3. 레이더 차트
+# -----------------------
+st.subheader("📌 선수 능력치 레이더 차트")
 
-# ----------------------------------------------------
-# 포지션 필터
-# ----------------------------------------------------
-positions = list(set([p["position"] for p in PLAYERS.values()]))
-selected_position = st.selectbox("포지션 필터", ["전체"] + positions)
-
-if selected_position != "전체":
-    filtered = {k:v for k,v in filtered.items() if v["position"] == selected_position}
-
-# ----------------------------------------------------
-# 자동 랭킹 계산 (능력치 평균 기준)
-# ----------------------------------------------------
-rank_scores = {name: sum(info["stats"].values())/5 for name, info in PLAYERS.items()}
-ranked = sorted(rank_scores.items(), key=lambda x: x[1], reverse=True)
-
-st.markdown("## 🏆 능력치 기반 자동 랭킹")
-for i, (name, score) in enumerate(ranked, 1):
-    st.write(f"**{i}. {name}** — 점수: {round(score,1)}")
-
-st.markdown("---")
-
-# ----------------------------------------------------
-# 선수 선택
-# ----------------------------------------------------
-col1, col2 = st.columns(2)
-player1_choice = col1.selectbox("선수 1 선택", list(filtered.keys()))
-player2_choice = col2.selectbox("선수 2 선택", list(filtered.keys()))
-
-player1 = filtered[player1_choice]
-player2 = filtered[player2_choice]
-
-# ----------------------------------------------------
-# 능력치 커스텀
-# ----------------------------------------------------
-st.subheader("🎛 능력치 커스텀 (원하면 수정 가능)")
-
-colA, colB = st.columns(2)
-with colA:
-    p1_stats = {}
-    for k,v in player1["stats"].items():
-        p1_stats[k] = st.slider(f"{player1_choice} - {k}", 0, 100, v)
-with colB:
-    p2_stats = {}
-    for k,v in player2["stats"].items():
-        p2_stats[k] = st.slider(f"{player2_choice} - {k}", 0, 100, v)
-
-# ----------------------------------------------------
-# 레이더 차트
-# ----------------------------------------------------
-categories = list(player1["stats"].keys())
+categories = ["스피드", "기술", "파워", "지능"]
 fig = go.Figure()
-fig.add_trace(go.Scatterpolar(r=list(p1_stats.values()), theta=categories, fill='toself', name=player1_choice))
-fig.add_trace(go.Scatterpolar(r=list(p2_stats.values()), theta=categories, fill='toself', name=player2_choice))
-fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0,100])), showlegend=True)
+
+for _, row in compare_df.iterrows():
+    fig.add_trace(go.Scatterpolar(
+        r=[row[c] for c in categories],
+        theta=categories,
+        fill='toself',
+        name=row["이름"]
+    ))
+
+fig.update_layout(height=500, showlegend=True)
 st.plotly_chart(fig, use_container_width=True)
 
-# ----------------------------------------------------
-# 자동 비교 분석
-# ----------------------------------------------------
-st.subheader("🧠 AI 비교 분석")
+# -----------------------
+# 4. 세부 능력치 표
+# -----------------------
+st.subheader("📊 선수 능력치 비교 표")
+st.dataframe(compare_df.set_index("이름"))
 
-p1_total = sum(p1_stats.values())
-p2_total = sum(p2_stats.values())
+# -----------------------
+# 5. 바 차트 (기술 능력 비교)
+# -----------------------
+st.subheader("🔥 기술 능력 비교 그래프")
 
-if p1_total > p2_total:
-    st.write(f"🔥 **{player1_choice}** 가 전체적으로 더 우세합니다! (총합 {p1_total} vs {p2_total})")
-elif p2_total > p1_total:
-    st.write(f"🔥 **{player2_choice}** 가 전체적으로 더 우세합니다! (총합 {p2_total} vs {p1_total})")
+fig2 = go.Figure(data=[
+    go.Bar(
+        x=compare_df["이름"],
+        y=compare_df["기술"]
+    )
+])
+
+fig2.update_layout(yaxis_title="기술 능력치")
+st.plotly_chart(fig2, use_container_width=True)
+
+# -----------------------
+# 6. 간단한 경기력 예측 모델
+# -----------------------
+st.subheader("🔮 경기력 예측 (샘플)")
+
+compare_df["예측 점수"] = (
+    compare_df["스피드"] * 0.25 +
+    compare_df["기술"] * 0.35 +
+    compare_df["파워"] * 0.2 +
+    compare_df["지능"] * 0.2
+)
+
+winner = compare_df.sort_values("예측 점수", ascending=False).iloc[0]
+
+st.success(f"🏅 *예측 결과*: **{winner['이름']}** 선수가 가장 높은 경기력을 기록할 것으로 예상됩니다!")
+
+# -----------------------
+# 7. 선수 추천 기능
+# -----------------------
+st.subheader("🤖 AI 기반 선수 추천")
+
+option = st.selectbox("원하는 스타일을 선택하세요", ["스피드형", "기술형", "파워형", "밸런스형"])
+
+if option == "스피드형":
+    best = df.sort_values("스피드", ascending=False).iloc[0]
+elif option == "기술형":
+    best = df.sort_values("기술", ascending=False).iloc[0]
+elif option == "파워형":
+    best = df.sort_values("파워", ascending=False).iloc[0]
 else:
-    st.write("⚖️ 두 선수는 능력치 평균이 거의 동일합니다!")
+    df["합계"] = df[["스피드", "기술", "파워", "지능"]].sum(axis=1)
+    best = df.sort_values("합계", ascending=False).iloc[0]
 
-# ----------------------------------------------------
-# 시즌 기록 라인 차트
-# ----------------------------------------------------
-st.subheader("📊 시즌 기록 비교")
+st.info(f"👉 추천 선수: **{best['이름']}** (종목: {best['종목']})")
 
-season_fig = go.Figure()
-season_fig.add_trace(go.Scatter(x=list(player1["season"].keys()), y=list(player1["season"].values()),
-                                mode='lines+markers', name=player1_choice))
-season_fig.add_trace(go.Scatter(x=list(player2["season"].keys()), y=list(player2["season"].values()),
-                                mode='lines+markers', name=player2_choice))
-st.plotly_chart(season_fig, use_container_width=True)
+# -----------------------
+# 8. 종목 설명
+# -----------------------
+st.subheader("📘 종목 설명")
 
-# ----------------------------------------------------
-# 선수 카드
-# ----------------------------------------------------
-card1, card2 = st.columns(2)
+sports_info = {
+    "축구": "축구는 스피드, 기술, 지능의 균형이 매우 중요한 팀 스포츠입니다.",
+    "피겨스케이팅": "피겨는 예술성과 점프·스핀 기술의 정확성이 모두 요구됩니다.",
+    "농구": "농구는 파워, 점프력, 경기 지능이 크게 작용하는 종목입니다."
+}
 
-with card1:
-    st.markdown(f"<div class='player-card' style='background:{player1['team_color']}20;'>", unsafe_allow_html=True)
-    st.image(load_image(player1["image"]), width=250)
-    st.subheader(player1_choice)
-    with st.expander("자세히 보기"):
-        st.write(f"**클럽:** {player1['club']}")
-        st.write(f"**국적:** {player1['nationality']}")
-        st.write(f"**커리어:** {player1['career']}")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with card2:
-    st.markdown(f"<div class='player-card' style='background:{player2['team_color']}20;'>", unsafe_allow_html=True)
-    st.image(load_image(player2["image"]), width=250)
-    st.subheader(player2_choice)
-    with st.expander("자세히 보기"):
-        st.write(f"**클럽:** {player2['club']}")
-        st.write(f"**국적:** {player2['nationality']}")
-        st.write(f"**커리어:** {player2['career']}")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ----------------------------------------------------
-# 추천 기능
-# ----------------------------------------------------
-st.markdown("---")
-if st.button("🎯 오늘의 선수 추천"):
-    rname = random.choice(list(filtered.keys()))
-    r = filtered[rname]
-    st.write(f"### ⭐ 오늘의 추천: {rname}")
-    st.image(load_image(r["image"]), width=300)
-    st.write(f"클럽: {r['club']}")
-    st.write(f"국적: {r['nationality']}")
-    st.write(r["career"])
+for sport in compare_df["종목"].unique():
+    st.write(f"### 🏟 {sport}")
+    st.write(sports_info[sport])
