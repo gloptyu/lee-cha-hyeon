@@ -5,10 +5,10 @@ import random
 
 st.set_page_config(page_title="축구 선수 TOP10 비교", layout="wide")
 
-st.title("⚽ 축구 선수 TOP10 비교 & 추천 시스템")
+st.title("⚽ 축구 선수 TOP10 비교 & 추천 시스템 (커리어 포함)")
 
 # -----------------------
-# 1. 축구 선수 DB
+# 1. 축구 선수 DB (커리어/수상 추가)
 # -----------------------
 data = {
     "이름": ["손흥민", "리오넬 메시", "크리스티아누 호날두", "킬리안 음바페", "네이마르",
@@ -25,6 +25,18 @@ data = {
     "골": [22, 30, 28, 26, 22, 12, 27, 34, 5, 10],
     "도움": [12, 20, 15, 18, 19, 21, 13, 9, 3, 8],
     "경기": [34, 35, 32, 33, 30, 34, 33, 36, 32, 30],
+    "커리어": [
+        "토트넘 주전 공격수, 프리미어리그 골든부트 수상",
+        "바르셀로나·PSG·인터 마이애미 활약, 발롱도르 7회 수상",
+        "맨유·레알·유벤투스·알나스르, UEFA 챔피언스리그 우승 경험",
+        "PSG·프랑스 대표팀 주전, 월드컵 우승",
+        "산투스·바르셀로나·PSG, FIFA 컨페더레이션컵 우승",
+        "맨체스터 시티 핵심, EPL 최다 도움 기록",
+        "리버풀 핵심, 프리미어리그 득점왕",
+        "도르트문트·바이에른·바르셀로나, FIFA 클럽 월드컵 우승",
+        "리버풀 센터백, UEFA 챔피언스리그 우승",
+        "발렌시아 유스 출신, 마요르카 주전"
+    ],
     "이미지": [
         "https://upload.wikimedia.org/wikipedia/commons/2/2e/Son_Heung-min_2022.jpg",
         "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lionel_Messi_20180710.jpg",
@@ -47,7 +59,7 @@ df = pd.DataFrame(data)
 selected_players = st.sidebar.multiselect(
     "비교할 선수 선택 (축구 선수만)",
     df["이름"],
-    default=[df["이름"][0], df["이름"][1]]  # 기본 2명 선택
+    default=[df["이름"][0], df["이름"][1]]
 )
 
 if len(selected_players) < 2:
@@ -60,10 +72,8 @@ compare_df = df[df["이름"].isin(selected_players)]
 # 3. 레이더 차트
 # -----------------------
 st.subheader("📌 능력치 레이더 차트")
-
 categories = ["스피드", "드리블", "슈팅", "패스", "수비"]
 fig = go.Figure()
-
 for _, row in compare_df.iterrows():
     fig.add_trace(go.Scatterpolar(
         r=[row[c] for c in categories],
@@ -71,7 +81,6 @@ for _, row in compare_df.iterrows():
         fill='toself',
         name=row["이름"]
     ))
-
 fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=True)
 st.plotly_chart(fig, use_container_width=True)
 
@@ -79,14 +88,13 @@ st.plotly_chart(fig, use_container_width=True)
 # 4. 시즌 기록 막대 차트
 # -----------------------
 st.subheader("📊 시즌 기록 비교")
-
 season_data = compare_df.set_index("이름")[["골", "도움", "경기"]].T
 st.bar_chart(season_data)
 
 # -----------------------
-# 5. 선수 카드
+# 5. 선수 카드 + 커리어 표시
 # -----------------------
-st.subheader("🃏 선수 카드")
+st.subheader("🃏 선수 카드 (클럽·국적·커리어 포함)")
 cols = st.columns(len(compare_df))
 for i, (_, row) in enumerate(compare_df.iterrows()):
     with cols[i]:
@@ -94,6 +102,7 @@ for i, (_, row) in enumerate(compare_df.iterrows()):
         st.subheader(row["이름"])
         st.write(f"클럽: {row['클럽']}")
         st.write(f"국적: {row['국적']}")
+        st.write(f"🏆 커리어/수상: {row['커리어']}")
 
 # -----------------------
 # 6. AI 비교 분석
@@ -112,3 +121,4 @@ st.info(f"추천 선수: **{random_player['이름']}**")
 st.image(random_player["이미지"], width=200)
 st.write(f"클럽: {random_player['클럽']}")
 st.write(f"국적: {random_player['국적']}")
+st.write(f"🏆 커리어/수상: {random_player['커리어']}")
