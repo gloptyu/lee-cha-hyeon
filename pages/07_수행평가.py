@@ -6,7 +6,7 @@ import random
 st.set_page_config(page_title="⚽ 축구 선수 TOP10", layout="wide")
 
 # -----------------------
-# 페이지 배경 CSS
+# 1. 페이지 배경 CSS
 # -----------------------
 page_bg_img = """
 <style>
@@ -23,7 +23,7 @@ st.markdown(page_bg_img, unsafe_allow_html=True)
 st.title("⚽ 축구 선수 TOP10 비교 & 추천 (팀컬러 강조)")
 
 # -----------------------
-# 선수 데이터 + 팀 컬러
+# 2. 선수 데이터
 # -----------------------
 data = {
     "이름": ["손흥민", "리오넬 메시", "크리스티아누 호날두", "킬리안 음바페", "네이마르",
@@ -71,7 +71,7 @@ data = {
 df = pd.DataFrame(data)
 
 # -----------------------
-# 선수 선택
+# 3. 선수 선택
 # -----------------------
 selected_players = st.sidebar.multiselect(
     "비교할 선수 선택",
@@ -86,7 +86,7 @@ if len(selected_players) < 2:
 compare_df = df[df["이름"].isin(selected_players)]
 
 # -----------------------
-# 레이더 차트
+# 4. 레이더 차트
 # -----------------------
 st.subheader("📌 능력치 레이더 차트")
 categories = ["스피드", "드리블", "슈팅", "패스", "수비"]
@@ -102,7 +102,29 @@ fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), sho
 st.plotly_chart(fig, use_container_width=True)
 
 # -----------------------
-# 선수 카드 (팀 컬러 적용)
+# 5. 시즌 기록 막대그래프
+# -----------------------
+st.subheader("📊 시즌 기록 비교 (골 / 도움 / 경기)")
+season_metrics = ["골", "도움", "경기"]
+fig_bar = go.Figure()
+for _, row in compare_df.iterrows():
+    fig_bar.add_trace(go.Bar(
+        x=season_metrics,
+        y=[row[m] for m in season_metrics],
+        name=row["이름"],
+        marker_color=row["팀컬러"]
+    ))
+fig_bar.update_layout(
+    barmode='group',
+    title="선수별 시즌 기록 비교",
+    xaxis_title="기록",
+    yaxis_title="수치",
+    template="plotly_white"
+)
+st.plotly_chart(fig_bar, use_container_width=True)
+
+# -----------------------
+# 6. 선수 카드
 # -----------------------
 st.subheader("🃏 선수 카드")
 cols = st.columns(len(compare_df))
@@ -121,10 +143,32 @@ for i, (_, row) in enumerate(compare_df.iterrows()):
         )
 
 # -----------------------
-# 커리어/수상 상세 정보
+# 7. 커리어 / 수상 상세
 # -----------------------
 st.subheader("🏆 선수 커리어 & 수상 상세 정보")
 for _, row in compare_df.iterrows():
     st.write(f"**{row['이름']}**")
     for item in row["커리어"]:
         st.markdown(f"- {item}")
+
+# -----------------------
+# 8. AI 비교 분석
+# -----------------------
+st.subheader("🤖 AI 비교 분석")
+compare_df["총합"] = compare_df[categories].sum(axis=1)
+winner = compare_df.sort_values("총합", ascending=False).iloc[0]
+st.success(f"🏅 예상 최강 선수: **{winner['이름']}** (총합 능력치: {winner['총합']})")
+
+# -----------------------
+# 9. 오늘의 추천 선수
+# -----------------------
+st.subheader("🎯 오늘의 추천 선수")
+random_player = compare_df.sample(1).iloc[0]
+st.info(f"추천 선수: **{random_player['이름']}**")
+st.image(random_player["이미지"], width=200)
+st.write(f"클럽: {random_player['클럽']}")
+st.write(f"국적: {random_player['국적']}")
+st.write("커리어/수상:")
+for item in random_player["커리어"]:
+    st.markdown(f"- {item}")
+
