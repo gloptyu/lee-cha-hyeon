@@ -4,11 +4,10 @@ import plotly.graph_objects as go
 import random
 
 st.set_page_config(page_title="축구 선수 TOP10 비교", layout="wide")
-
-st.title("⚽ 축구 선수 TOP10 비교 & 추천 시스템 (커리어 포함)")
+st.title("⚽ 축구 선수 TOP10 비교 & 상세 커리어")
 
 # -----------------------
-# 1. 축구 선수 DB (커리어/수상 추가)
+# 1. 축구 선수 데이터
 # -----------------------
 data = {
     "이름": ["손흥민", "리오넬 메시", "크리스티아누 호날두", "킬리안 음바페", "네이마르",
@@ -26,16 +25,16 @@ data = {
     "도움": [12, 20, 15, 18, 19, 21, 13, 9, 3, 8],
     "경기": [34, 35, 32, 33, 30, 34, 33, 36, 32, 30],
     "커리어": [
-        "토트넘 주전 공격수, 프리미어리그 골든부트 수상",
-        "바르셀로나·PSG·인터 마이애미 활약, 발롱도르 7회 수상",
-        "맨유·레알·유벤투스·알나스르, UEFA 챔피언스리그 우승 경험",
-        "PSG·프랑스 대표팀 주전, 월드컵 우승",
-        "산투스·바르셀로나·PSG, FIFA 컨페더레이션컵 우승",
-        "맨체스터 시티 핵심, EPL 최다 도움 기록",
-        "리버풀 핵심, 프리미어리그 득점왕",
-        "도르트문트·바이에른·바르셀로나, FIFA 클럽 월드컵 우승",
-        "리버풀 센터백, UEFA 챔피언스리그 우승",
-        "발렌시아 유스 출신, 마요르카 주전"
+        ["토트넘 주전 공격수", "프리미어리그 골든부트 수상"],
+        ["바르셀로나·PSG·인터 마이애미 활약", "발롱도르 7회 수상", "FIFA 올해의 선수 수상"],
+        ["맨유·레알·유벤투스·알나스르", "UEFA 챔피언스리그 우승 경험", "유러피언 골든슈 수상"],
+        ["PSG·프랑스 대표팀 주전", "월드컵 우승", "골든보이 수상"],
+        ["산투스·바르셀로나·PSG", "FIFA 컨페더레이션컵 우승", "리그 득점왕 수상"],
+        ["맨체스터 시티 핵심", "EPL 최다 도움 기록", "UEFA 올해의 미드필더 수상"],
+        ["리버풀 핵심", "프리미어리그 득점왕", "프리미어리그 올해의 선수"],
+        ["도르트문트·바이에른·바르셀로나", "FIFA 클럽 월드컵 우승", "분데스리가 득점왕"],
+        ["리버풀 센터백", "UEFA 챔피언스리그 우승", "프리미어리그 올해의 수비수"],
+        ["발렌시아 유스 출신", "마요르카 주전", "유럽 U19 대회 우승"]
     ],
     "이미지": [
         "https://upload.wikimedia.org/wikipedia/commons/2/2e/Son_Heung-min_2022.jpg",
@@ -54,7 +53,7 @@ data = {
 df = pd.DataFrame(data)
 
 # -----------------------
-# 2. 선수 선택 (축구 선수 전용)
+# 2. 선수 선택
 # -----------------------
 selected_players = st.sidebar.multiselect(
     "비교할 선수 선택 (축구 선수만)",
@@ -92,9 +91,9 @@ season_data = compare_df.set_index("이름")[["골", "도움", "경기"]].T
 st.bar_chart(season_data)
 
 # -----------------------
-# 5. 선수 카드 + 커리어 표시
+# 5. 선수 카드 (사진 + 이름 + 클럽 + 국적)
 # -----------------------
-st.subheader("🃏 선수 카드 (클럽·국적·커리어 포함)")
+st.subheader("🃏 선수 카드")
 cols = st.columns(len(compare_df))
 for i, (_, row) in enumerate(compare_df.iterrows()):
     with cols[i]:
@@ -102,10 +101,18 @@ for i, (_, row) in enumerate(compare_df.iterrows()):
         st.subheader(row["이름"])
         st.write(f"클럽: {row['클럽']}")
         st.write(f"국적: {row['국적']}")
-        st.write(f"🏆 커리어/수상: {row['커리어']}")
 
 # -----------------------
-# 6. AI 비교 분석
+# 6. 커리어/수상 상세 정보 섹션
+# -----------------------
+st.subheader("🏆 선수 커리어 & 수상 상세 정보")
+for _, row in compare_df.iterrows():
+    st.write(f"**{row['이름']}**")
+    for item in row["커리어"]:
+        st.markdown(f"- {item}")
+
+# -----------------------
+# 7. AI 비교 분석
 # -----------------------
 st.subheader("🤖 AI 비교 분석")
 compare_df["총합"] = compare_df[categories].sum(axis=1)
@@ -113,7 +120,7 @@ winner = compare_df.sort_values("총합", ascending=False).iloc[0]
 st.success(f"🏅 예상 최강 선수: **{winner['이름']}** (총합 능력치: {winner['총합']})")
 
 # -----------------------
-# 7. 오늘의 추천 선수
+# 8. 오늘의 추천 선수
 # -----------------------
 st.subheader("🎯 오늘의 추천 선수")
 random_player = compare_df.sample(1).iloc[0]
@@ -121,4 +128,6 @@ st.info(f"추천 선수: **{random_player['이름']}**")
 st.image(random_player["이미지"], width=200)
 st.write(f"클럽: {random_player['클럽']}")
 st.write(f"국적: {random_player['국적']}")
-st.write(f"🏆 커리어/수상: {random_player['커리어']}")
+st.write("커리어/수상:")
+for item in random_player["커리어"]:
+    st.markdown(f"- {item}")
