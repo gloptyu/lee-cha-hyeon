@@ -124,7 +124,7 @@ fig_bar.update_layout(
 st.plotly_chart(fig_bar, use_container_width=True)
 
 # -----------------------
-# 6. 선수 카드
+# 6. 선수 카드 (글씨 대비 개선)
 # -----------------------
 st.subheader("🃏 선수 카드")
 cols = st.columns(len(compare_df))
@@ -133,11 +133,13 @@ for i, (_, row) in enumerate(compare_df.iterrows()):
     with cols[i]:
         st.markdown(
             f"""
-            <div style="background-color:{card_color};padding:10px;border-radius:15px;text-align:center;">
-            <img src="{row['이미지']}" width="180" style="border-radius:15px;">
-            <h4 style="color:white">{row['이름']}</h4>
-            <p style="color:white">클럽: {row['클럽']}</p>
-            <p style="color:white">국적: {row['국적']}</p>
+            <div style="background-color:{card_color};border-radius:15px;text-align:center;overflow:hidden;">
+                <div style="background-color: rgba(0,0,0,0.6); padding:10px; border-radius:15px;">
+                    <img src="{row['이미지']}" width="180" style="border-radius:15px;">
+                    <h4 style="color:white">{row['이름']}</h4>
+                    <p style="color:white">클럽: {row['클럽']}</p>
+                    <p style="color:white">국적: {row['국적']}</p>
+                </div>
             </div>
             """, unsafe_allow_html=True
         )
@@ -171,4 +173,3 @@ st.write(f"국적: {random_player['국적']}")
 st.write("커리어/수상:")
 for item in random_player["커리어"]:
     st.markdown(f"- {item}")
-
