@@ -39,6 +39,7 @@ page_bg = f"""
     padding: 18px;
     border-radius: 15px;
     box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+    margin-bottom: 10px;
 }}
 
 </style>
@@ -63,7 +64,6 @@ PLAYERS = {
         "position": "공격수",
         "season": {"골": 30, "도움": 20, "경기": 35}
     },
-
     "크리스티아누 호날두": {
         "club": "알나스르",
         "nationality": "포르투갈",
@@ -77,7 +77,6 @@ PLAYERS = {
         "position": "공격수",
         "season": {"골": 28, "도움": 15, "경기": 32}
     },
-
     "킬리안 음바페": {
         "club": "레알 마드리드",
         "nationality": "프랑스",
@@ -90,7 +89,6 @@ PLAYERS = {
         "position": "공격수",
         "season": {"골": 26, "도움": 18, "경기": 33}
     },
-
     "네이마르": {
         "club": "산투스",
         "nationality": "브라질",
@@ -103,7 +101,6 @@ PLAYERS = {
         "position": "공격수",
         "season": {"골": 22, "도움": 19, "경기": 30}
     },
-
     "케빈 더 브라위너": {
         "club": "맨시티",
         "nationality": "벨기에",
@@ -116,7 +113,6 @@ PLAYERS = {
         "position": "미드필더",
         "season": {"골": 12, "도움": 21, "경기": 34}
     },
-
     "모하메드 살라": {
         "club": "리버풀",
         "nationality": "이집트",
@@ -129,7 +125,6 @@ PLAYERS = {
         "position": "공격수",
         "season": {"골": 27, "도움": 13, "경기": 33}
     },
-
     "레반도프스키": {
         "club": "바르셀로나",
         "nationality": "폴란드",
@@ -142,7 +137,6 @@ PLAYERS = {
         "position": "공격수",
         "season": {"골": 34, "도움": 9, "경기": 36}
     },
-
     "반 다이크": {
         "club": "리버풀",
         "nationality": "네덜란드",
@@ -155,10 +149,6 @@ PLAYERS = {
         "position": "수비수",
         "season": {"골": 5, "도움": 3, "경기": 32}
     },
-
-    # ----------------------------
-    # 🔥 여기부터 추가된 선수들
-    # ----------------------------
     "손흥민": {
         "club": "토트넘",
         "nationality": "대한민국",
@@ -171,7 +161,6 @@ PLAYERS = {
         "position": "공격수",
         "season": {"골": 24, "도움": 11, "경기": 34}
     },
-
     "카림 벤제마": {
         "club": "알 이티하드",
         "nationality": "프랑스",
@@ -184,7 +173,6 @@ PLAYERS = {
         "position": "공격수",
         "season": {"골": 31, "도움": 12, "경기": 35}
     },
-
     "안투안 그리즈만": {
         "club": "AT 마드리드",
         "nationality": "프랑스",
@@ -197,7 +185,6 @@ PLAYERS = {
         "position": "공격수",
         "season": {"골": 21, "도움": 17, "경기": 34}
     },
-
     "루카 모드리치": {
         "club": "레알 마드리드",
         "nationality": "크로아티아",
@@ -210,7 +197,6 @@ PLAYERS = {
         "position": "미드필더",
         "season": {"골": 7, "도움": 12, "경기": 34}
     },
-
     "티보 쿠르투아": {
         "club": "레알 마드리드",
         "nationality": "벨기에",
@@ -246,12 +232,10 @@ p2 = PLAYERS[p2_name]
 # 능력치 비교 레이더 차트
 # -----------------------------
 stats_cat = list(p1["stats"].keys())
-
 fig = go.Figure()
 fig.add_trace(go.Scatterpolar(r=list(p1["stats"].values()), theta=stats_cat, fill='toself', name=p1_name))
 fig.add_trace(go.Scatterpolar(r=list(p2["stats"].values()), theta=stats_cat, fill='toself', name=p2_name))
 fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=True, template="plotly_dark")
-
 st.subheader("📊 능력치 레이더 차트 비교")
 st.plotly_chart(fig)
 
@@ -265,7 +249,6 @@ st.bar_chart({p1_name: p1["season"], p2_name: p2["season"]})
 # 선수 카드
 # -----------------------------
 st.subheader("🃏 선수 카드")
-
 colA, colB = st.columns(2)
 for col, (name, data) in zip([colA, colB], [(p1_name, p1), (p2_name, p2)]):
     card_html = f"""
@@ -286,7 +269,6 @@ st.markdown("---")
 if st.button("오늘의 추천 선수 🎯"):
     rp = random.choice(list(PLAYERS.keys()))
     pdata = PLAYERS[rp]
-
     st.markdown(
         f"""
         <div class="white-box">
@@ -301,12 +283,15 @@ if st.button("오늘의 추천 선수 🎯"):
     )
 
 # -----------------------------
-# 전체 선수 목록
+# 전체 선수 목록 (⚪ 이모지 추가)
 # -----------------------------
 st.markdown("---")
 st.subheader("📌 전체 선수 목록")
-
-st.markdown("<div class='white-box'>", unsafe_allow_html=True)
 for i, n in enumerate(PLAYERS.keys(), start=1):
-    st.write(f"{i}. {n} — {PLAYERS[n]['club']} ({PLAYERS[n]['nationality']})")
-st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class='white-box'>⚪ {i}. {n} — {PLAYERS[n]['club']} ({PLAYERS[n]['nationality']})</div>
+        """,
+        unsafe_allow_html=True
+    )
+
